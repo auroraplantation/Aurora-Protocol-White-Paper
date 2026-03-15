@@ -1,96 +1,107 @@
 # Burn-to-Claim
 
-> **Aurora Protocol's redemption mechanism requires investors to permanently burn their RWA tokens in exchange for their proportional share of repaid capital — ensuring a clean, one-time settlement with no residual token claims.**
+The **Burn-to-Claim** mechanism is Aurora Protocol's returns distribution system. It is implemented through the **ClaimVault** contract and provides a deterministic, tamper-proof method for token holders to redeem their share of batch returns.
 
 ---
 
-## Overview
+## Mechanism Overview
 
-The **Burn-to-Claim** mechanism is implemented in the `ClaimVault` contract. It governs the final stage of the batch lifecycle: when the Originator repays principal plus yield, investors exchange (burn) their ERC-1155 RWA tokens to receive `USDC` payouts.
+After a batch completes all three milestones, the originator deposits the agreed return amount (principal + yield) into the ClaimVault. Token holders then **burn** their ERC-1155 RWA tokens to claim their proportional share of the deposited funds.
 
-This design ensures that each token can only be redeemed once, eliminates the possibility of double claims, and provides a cryptographically verifiable settlement process.
-
----
-
-## How It Works
-
-```mermaid
-sequenceDiagram
-    participant O as Originator
-    participant CV as ClaimVault
-    participant RWA as AuroraRWA1155
-    participant I as Investor
-
-    O->>CV: repay(batchId, amount) — deposits USDC
-    Note over CV: Repayment pool funded
-
-    I->>CV: claim(batchId, tokenAmount)
-    CV->>RWA: burn(investor, batchId, tokenAmount)
-    Note over RWA: Tokens permanently destroyed
-    CV->>I: transfer USDC (pro-rata share)
-    Note over I: Settlement complete
-```
+The core principle is simple: **one token burned = one proportional claim settled**. Burning extinguishes the token permanently, ensuring that each claim can only be exercised once.
 
 ---
 
-## Step-by-Step Process
-
-### Step 1 — Originator Repayment
-
-After all milestones are completed, the Originator deposits the full repayment amount (principal + yield) into `ClaimVault` by calling `repay()`. The repayment is denominated in `USDC`.
-
-### Step 2 — Investor Initiates Claim
-
-An investor holding RWA tokens for the completed batch calls `claim()` on the `ClaimVault`, specifying the number of tokens to redeem.
-
-### Step 3 — Token Burn
-
-The `ClaimVault` calls `burn()` on `AuroraRWA1155`, permanently destroying the specified tokens from the investor's wallet. This is an irreversible on-chain operation.
-
-### Step 4 — USDC Payout
-
-The `ClaimVault` calculates the investor's pro-rata share based on:
+## Claim Flow
 
 ```
-payout = (tokensBurned / totalTokenSupply) × totalRepaymentPool
+   Originator                 ClaimVault               Token Holder
+       │                          │                          │
+       │  deposit returns (USDC)  │                          │
+       │─────────────────────────►│                          │
+       │                          │                          │
+       │                          │   burn RWA tokens        │
+       │                          │◄─────────────────────────│
+       │                          │                          │
+       │                          │   transfer USDC          │
+       │                          │─────────────────────────►│
+       │                          │                          │
 ```
 
-The calculated `USDC` amount is transferred to the investor's wallet.
+### Step-by-Step
+
+1. **Return Deposit** — The originator transfers the full return amount (principal + yield) in USDC to the ClaimVault contract.
+
+2. **Claim Initiation** — A token holder calls the `claim()` function on the ClaimVault, specifying the number of tokens to burn.
+
+3. **Token Burn** — The ClaimVault calls `burn()` on the AuroraRWA1155 contract, permanently destroying the specified tokens from the holder's balance.
+
+4. **USDC Transfer** — The ClaimVault calculates and transfers the proportional USDC amount to the holder's wallet.
 
 ---
 
-## Design Rationale
+## Claim Calculation
 
-| Property | Benefit |
-|----------|---------|
-| **Permanent Burn** | Eliminates double-claim risk — once burned, tokens cannot be reused |
-| **Pro-Rata Fairness** | Every token carries identical claim weight within a batch |
-| **On-Chain Verifiability** | Burn events and transfer events are publicly auditable |
-| **No Expiry** | Investors can claim at any time after repayment — no redemption deadline |
-| **Atomic Execution** | Burn and payout occur in a single transaction — no partial states |
+The amount each holder receives is calculated as:
+
+```
+claim_amount = (tokens_burned / total_token_supply) × total_vault_balance
+```
+
+Where:
+- `tokens_burned` = number of RWA tokens the holder is burning in this transaction
+- `total_token_supply` = total supply of RWA tokens for this batch at the time of the claim
+- `total_vault_balance` = total USDC deposited in the ClaimVault for this batch
+
+**Example:**
+- Total token supply: 10,000
+- Total vault balance: 105,000 USDC (100,000 principal + 5,000 yield)
+- Holder burns 500 tokens
+- Claim amount: (500 / 10,000) × 105,000 = **5,250 USDC**
 
 ---
 
-## Key Functions
+## Design Properties
 
-| Function | Access | Description |
-|----------|--------|-------------|
-| `repay()` | Originator | Deposits USDC repayment into the claim pool |
-| `claim()` | Investor (Token Holder) | Burns tokens and receives proportional USDC payout |
-| `claimable()` | Public | Returns the USDC amount claimable for a given token quantity |
-| `totalRepaid()` | Public | Returns the total USDC deposited by the Originator |
+### No Double-Claiming
+
+The burn mechanism inherently prevents double-claiming. Once tokens are burned, they are permanently removed from the holder's balance and from total supply. There is no way to re-mint or recover burned tokens.
+
+### Partial Claims
+
+Holders are not required to burn all their tokens at once. They can execute multiple partial claims over time. Each claim recalculates the proportional share based on the current remaining vault balance and remaining token supply.
+
+### Atomic Execution
+
+Each claim transaction is atomic — the burn and the USDC transfer occur in the same transaction. If either operation fails, the entire transaction reverts. There is no intermediate state where tokens are burned but funds are not transferred.
+
+### No Expiry
+
+There is no deadline to claim. Token holders can burn and claim at any time after the vault is funded. Unclaimed funds remain in the ClaimVault indefinitely.
 
 ---
 
 ## Edge Cases
 
 | Scenario | Behavior |
-|----------|----------|
-| **Partial claim** | Investor burns a subset of their tokens; remaining tokens retain claim rights |
-| **Batch failed (no repayment)** | ClaimVault remains empty; investors use `EscrowVault.refund()` instead |
-| **Originator partial repayment** | Payout is calculated against actual deposited amount, not expected amount |
-| **Zero token balance** | Transaction reverts — cannot burn tokens the caller does not hold |
+|---|---|
+| Holder tries to claim with zero tokens | Transaction reverts |
+| Holder tries to burn more tokens than their balance | Transaction reverts |
+| ClaimVault has zero balance | Transaction reverts (no funds to distribute) |
+| Originator deposits partial returns | Holders receive proportional share of whatever is deposited |
+| All tokens burned, residual dust in vault | Handled by integer rounding; negligible amounts may remain |
 
 ---
 
-> **Next**: [Verification →](Verification.md)
+## Why Burn-to-Claim?
+
+Alternative distribution mechanisms were considered and rejected:
+
+| Approach | Issue |
+|---|---|
+| Airdrop (push-based) | Gas cost scales linearly with number of holders; sender pays all gas |
+| Merkle claim (snapshot) | Requires off-chain snapshot generation; adds trust assumptions |
+| Proportional streaming | Over-engineered for discrete batch settlements |
+| **Burn-to-claim (pull-based)** | **Each holder pays their own gas; no snapshot needed; self-enforcing via token destruction** |
+
+The burn-to-claim pattern is the most capital-efficient, trust-minimized, and gas-fair distribution method for Aurora's batch settlement model.

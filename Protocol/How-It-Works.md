@@ -1,93 +1,98 @@
 # How It Works
 
-> **A complete lifecycle view of how agricultural financing flows through Aurora Protocol — from batch origination to investor redemption.**
+Aurora Protocol operates through a **batch-based financing lifecycle** that connects DeFi capital providers with agricultural producers in Southeast Asia. Each batch represents a single, self-contained financing operation with a defined timeline, asset type, and return profile.
 
 ---
 
-## Overview
+## The Batch Lifecycle
 
-Aurora Protocol operates as a trustless pipeline connecting agricultural producers (Originators) with global DeFi investors. Each financing cycle is structured as a **Batch** — a discrete, smart-contract-governed unit representing a specific agricultural project with defined terms, milestones, and returns.
+### Phase 1 — Origination
 
-The protocol manages every stage on-chain, ensuring full transparency and eliminating reliance on intermediaries.
+An agricultural originator — typically a cooperative, aggregator, or farm operator — submits a financing request to Aurora Labs. The request specifies:
 
----
+- Crop type, geography, and production timeline
+- Financing amount required (denominated in USDC)
+- Expected return and repayment schedule
+- Milestone structure (typically aligned with planting, growth, and harvest cycles)
 
-## End-to-End Lifecycle
+Aurora Labs performs due diligence through the [5-layer verification architecture](Verification.md), assessing the originator's track record, operational capacity, and the viability of the underlying agricultural operation.
 
-```mermaid
-graph TD
-    A[1. Originator Submits Batch] --> B[2. Platform Verification]
-    B --> C[3. Batch Created On-Chain]
-    C --> D[4. RWA Tokens Minted — ERC-1155]
-    D --> E[5. Primary Sale Opens]
-    E --> F[6. Investors Subscribe with USDC]
-    F --> G[7. Funding Target Reached]
-    G --> H[8. EscrowVault — Milestone Disbursement]
-    H --> I[9. Milestone 1 → 2 → 3 Completed]
-    I --> J[10. ClaimVault — Burn-to-Claim Redemption]
-    J --> K[11. Investors Receive Principal + Yield]
+### Phase 2 — Batch Deployment
+
+Upon approval, Aurora Labs deploys a new batch on-chain via the **BatchFactory** contract. This single transaction atomically creates:
+
+- A new **AuroraRWA1155** token contract representing fractional participation in the batch
+- A linked **PrimarySale** contract for token distribution
+- A dedicated **EscrowVault** to hold and release funds according to the milestone schedule
+- A linked **ClaimVault** for returns distribution upon completion
+
+Each batch is a completely independent on-chain entity. There is no cross-collateralization or shared state between batches.
+
+### Phase 3 — Primary Sale
+
+The batch enters a funding window during which DeFi participants can purchase ERC-1155 RWA tokens through the PrimarySale contract. Key mechanics:
+
+- **Denomination:** All transactions are in USDC
+- **Fractional Access:** Each token represents an equal fractional share of the batch
+- **Fixed Price:** Token price is set at batch creation and does not change during the sale
+- **Funding Target:** The batch has a defined target amount; the sale closes when the target is reached or the window expires
+
+If the funding target is not met within the window, the batch transitions to a **Failed** state and all funds are returned to participants via the EscrowVault.
+
+### Phase 4 — Milestone Execution
+
+Once fully funded, the EscrowVault transitions through a series of milestone states:
+
+```
+Funded → Milestone 1 → Milestone 2 → Milestone 3
 ```
 
----
+At each milestone:
 
-## Step-by-Step Breakdown
+1. The originator submits evidence of milestone completion (e.g., planting confirmation, growth inspection, harvest documentation)
+2. Aurora Labs verifies the evidence through its verification process
+3. Upon confirmation, the smart contract releases the corresponding tranche of funds to the originator
 
-### Step 1 — Batch Origination
+This staged release mechanism ensures that capital is disbursed only as real-world progress is demonstrated. See [EscrowVault](EscrowVault.md) for the full state machine specification.
 
-An Originator (agricultural producer or cooperative) submits a financing request specifying the crop type, required capital, expected yield, repayment timeline, and milestone structure. The Originator must meet platform eligibility requirements, including identity verification and staking collateral (see [Originator Security](../Economics/Originator-Security.md)).
+### Phase 5 — Returns Distribution (Burn-to-Claim)
 
-### Step 2 — Platform Verification
+Upon successful completion of all milestones:
 
-The submitted batch undergoes a multi-layer verification process covering identity, agricultural data, financial projections, and on-the-ground validation. For details, see [Verification](Verification.md).
+1. The originator deposits the agreed return amount (principal + yield) into the **ClaimVault**
+2. The EscrowVault reaches its terminal state (Milestone 3 complete)
+3. RWA token holders burn their tokens through the ClaimVault to claim their proportional share of the returns
 
-### Step 3 — On-Chain Batch Creation
-
-Once approved, `BatchFactory` deploys a new batch instance using the minimal proxy clone pattern (EIP-1167). Each batch is an independent, isolated smart contract instance with its own parameters and lifecycle.
-
-### Step 4 — RWA Token Minting
-
-`AuroraRWA1155` mints fractional participation tokens (ERC-1155) representing pro-rata claims on the batch's future cash flows. Each token is fungible within its batch but unique across batches.
-
-### Step 5 — Primary Sale
-
-`PrimarySale` opens a subscription window during which investors can purchase RWA tokens using `USDC`. The sale enforces minimum/maximum subscription amounts and a defined funding deadline.
-
-### Step 6 — Investor Subscription
-
-Investors browse available batches, review terms and verification data, and commit `USDC` to purchase tokens. All subscriptions are recorded on-chain.
-
-### Step 7 — Funding Completion
-
-When the batch reaches its funding target, the sale closes and funds are transferred to `EscrowVault`. If the target is not met by the deadline, the batch enters a **Failed** state and investors can reclaim their `USDC`.
-
-### Step 8 — Milestone-Based Disbursement
-
-`EscrowVault` holds the pooled `USDC` and releases funds to the Originator incrementally as predefined milestones are verified and approved. The vault follows a strict 7-state machine (see [EscrowVault](EscrowVault.md)).
-
-### Step 9 — Project Completion
-
-As each milestone is confirmed — typically corresponding to planting, growing, and harvest phases — the Originator receives the corresponding tranche of funds. Upon completion of all three milestones, the Originator repays the batch principal plus agreed yield.
-
-### Step 10 — Burn-to-Claim Redemption
-
-Repaid funds flow into `ClaimVault`. Investors burn their RWA tokens to claim their proportional share of the repayment. See [Burn-to-Claim](Burn-to-Claim.md) for the full mechanism.
-
-### Step 11 — Settlement
-
-Investors receive their principal plus yield in `USDC`. The batch lifecycle is complete.
+The burn-to-claim mechanism ensures a clean, deterministic settlement: one token equals one claim, and burning it extinguishes the obligation. See [Burn-to-Claim](Burn-to-Claim.md) for details.
 
 ---
 
-## Key Design Principles
+## Failure Handling
 
-| Principle | Implementation |
-|-----------|----------------|
-| **Trustless Execution** | All fund flows governed by smart contracts — no manual custody |
-| **Transparency** | Every state transition is recorded on Ethereum and publicly verifiable |
-| **Isolation** | Each batch is an independent contract instance — failure in one batch does not affect others |
-| **Milestone Gating** | Funds are released only upon verified milestone completion — protecting investor capital |
-| **Permissionless Investment** | Any wallet holder can participate in primary sales using `USDC` |
+If a batch fails at any stage after funding — due to crop failure, originator default, or force majeure — the EscrowVault transitions to a **Failed** state. In this scenario:
+
+- Any unreleased funds remaining in the EscrowVault are made available for participant withdrawal
+- Funds already disbursed to the originator in prior milestones are subject to off-chain recovery processes
+- The originator's staked $AUR collateral (see [Originator Security](../Economics/Originator-Security.md)) may be slashed as a partial loss mitigation mechanism
+
+Aurora Protocol does not guarantee principal return. Each batch carries independent risk, and participants should evaluate each batch on its own merits.
 
 ---
 
-> **Next**: [Smart Contracts →](Smart-Contracts.md)
+## Participant Roles
+
+| Role | Description |
+|---|---|
+| **DeFi Participant** | Purchases RWA tokens to fund batches; earns yield upon successful completion |
+| **Originator** | Agricultural producer or aggregator seeking financing; must pass verification and stake $AUR |
+| **Aurora Labs** | Platform operator; deploys batches, manages verification, operates the frontend |
+| **Smart Contracts** | Autonomous on-chain enforcement of fund flows, state transitions, and claims |
+
+---
+
+## Key Properties
+
+- **Non-custodial:** Aurora Labs never holds participant funds. All capital sits in smart contracts.
+- **Deterministic:** Fund releases follow predefined rules. No manual override of contract state.
+- **Isolated:** Each batch is economically independent. One batch's failure does not cascade to others.
+- **Transparent:** All state transitions, fund movements, and claims are visible on Ethereum.

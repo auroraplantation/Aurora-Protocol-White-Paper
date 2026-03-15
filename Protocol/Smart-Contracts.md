@@ -1,120 +1,136 @@
 # Smart Contracts
 
-> **Aurora Protocol's on-chain infrastructure is composed of five interdependent smart contracts built on Ethereum with OpenZeppelin libraries and the minimal proxy clone pattern.**
+Aurora Protocol's on-chain infrastructure consists of **five core smart contracts** that together govern the complete lifecycle of a batch financing operation. All contracts are deployed on **Ethereum mainnet**, written in **Solidity ^0.8.20**, and built on top of **OpenZeppelin** standard libraries.
 
 ---
 
 ## Architecture Overview
 
-```mermaid
-graph TB
-    subgraph Core Contracts
-        BF[BatchFactory]
-        RWA[AuroraRWA1155]
-        PS[PrimarySale]
-        EV[EscrowVault]
-        CV[ClaimVault]
-    end
-
-    BF -->|Deploys| RWA
-    BF -->|Deploys| PS
-    BF -->|Deploys| EV
-    BF -->|Deploys| CV
-    PS -->|Transfers USDC| EV
-    EV -->|Releases on Milestone| Originator
-    Originator -->|Repays| CV
-    CV -->|Burns Token, Pays| Investor
-
-    style BF fill:#1a1a2e,stroke:#e94560,color:#fff
-    style RWA fill:#1a1a2e,stroke:#0f3460,color:#fff
-    style PS fill:#1a1a2e,stroke:#0f3460,color:#fff
-    style EV fill:#1a1a2e,stroke:#0f3460,color:#fff
-    style CV fill:#1a1a2e,stroke:#0f3460,color:#fff
+```
+                    ┌──────────────┐
+                    │ BatchFactory │
+                    └──────┬───────┘
+                           │ deploys (minimal proxy clone)
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+      ┌──────────────┐ ┌───────────┐ ┌────────────┐
+      │ AuroraRWA1155│ │PrimarySale│ │ EscrowVault│
+      └──────────────┘ └───────────┘ └─────┬──────┘
+                                           │
+                                    ┌──────▼──────┐
+                                    │  ClaimVault  │
+                                    └─────────────┘
 ```
 
----
-
-## Contract Summary
-
-| Contract | Role | Key Functions | Token Standard |
-|----------|------|---------------|----------------|
-| **BatchFactory** | Factory & orchestrator — deploys and initializes all other contracts per batch | `createBatch()`, `initialize()` | — |
-| **AuroraRWA1155** | Mints and manages fractional participation tokens for each batch | `mint()`, `burn()`, `balanceOf()` | ERC-1155 |
-| **PrimarySale** | Manages the investor subscription window and USDC collection | `subscribe()`, `close()`, `refund()` | — |
-| **EscrowVault** | Holds pooled USDC and releases funds based on milestone verification | `releaseMilestone()`, `markFailed()` | — |
-| **ClaimVault** | Accepts repayment and distributes to investors via burn-to-claim | `repay()`, `claim()` | — |
+Each batch deployment creates a new set of linked contract instances. The **minimal proxy clone pattern** (EIP-1167) is used to minimize gas costs — each new instance delegates to a pre-deployed implementation contract rather than redeploying the full bytecode.
 
 ---
 
-## Technical Specifications
+## Contract Specifications
 
-| Parameter | Value |
-|-----------|-------|
-| **Solidity Version** | ^0.8.20 |
-| **Framework** | OpenZeppelin Contracts |
-| **Deployment Pattern** | Minimal Proxy Clone (EIP-1167) |
-| **Network** | Ethereum Mainnet |
-| **Settlement Token** | USDC (ERC-20) |
-| **Access Control** | Role-Based (OpenZeppelin `AccessControl`) |
-| **Upgradeability** | Non-upgradeable (immutable per batch) |
+### 1. BatchFactory
+
+The factory contract is the single entry point for batch creation. It orchestrates the atomic deployment of all four child contracts for each new batch.
+
+**Responsibilities:**
+- Deploys minimal proxy clones of AuroraRWA1155, PrimarySale, EscrowVault, and ClaimVault
+- Links the four contracts to each other during initialization
+- Stores a registry of all deployed batches
+- Enforces deployment-time parameters (funding target, token supply, milestone schedule, fee rate)
+
+**Access:** Restricted to authorized deployers (Aurora Labs admin role).
+
+### 2. AuroraRWA1155
+
+The token contract implements the **ERC-1155** multi-token standard to represent fractional participation in a batch.
+
+**Responsibilities:**
+- Mints RWA tokens during the primary sale
+- Tracks ownership and balances of fractional batch participation
+- Supports burn operations for the claim process
+- Stores batch-level metadata (URI, batch parameters)
+
+**Design Rationale:** ERC-1155 was chosen over ERC-20 or ERC-721 for several reasons:
+- A single contract can represent multiple token types (enabling future multi-tranche batches)
+- Native batch transfer support reduces gas costs for portfolio operations
+- Metadata extensibility through token URI standards
+
+**Current State:** No secondary market trading is supported. Tokens are non-transferable in the current version (transfer restrictions enforced at the contract level). Secondary market functionality is planned for a future protocol upgrade.
+
+### 3. PrimarySale
+
+The sale contract manages the initial distribution of RWA tokens to participants.
+
+**Responsibilities:**
+- Accepts USDC deposits from participants
+- Mints corresponding RWA tokens via AuroraRWA1155
+- Enforces funding window (start time, end time)
+- Enforces funding target (minimum and maximum raise)
+- Forwards collected funds to the EscrowVault upon successful sale completion
+- Returns funds to participants if the funding target is not met
+
+**Denomination:** All primary sales are denominated in USDC (ERC-20 stablecoin).
+
+### 4. EscrowVault
+
+The escrow contract is the core fund management mechanism. It holds all batch capital and releases funds to the originator according to a predefined milestone schedule.
+
+**Responsibilities:**
+- Receives funds from the PrimarySale contract
+- Manages a **7-state finite state machine** governing the batch lifecycle
+- Releases milestone-based tranches to the originator upon authorized confirmation
+- Handles failure transitions and participant refunds
+- Deducts platform fees at the point of release
+
+See [EscrowVault](EscrowVault.md) for the complete state machine specification.
+
+### 5. ClaimVault
+
+The claim contract manages the distribution of returns to token holders after batch completion.
+
+**Responsibilities:**
+- Receives return deposits (principal + yield) from the originator or EscrowVault
+- Processes burn-to-claim redemptions: token holders burn their RWA tokens and receive proportional USDC
+- Ensures exact accounting between total deposits and total claims
+- Prevents double-claiming through burn mechanics (burned tokens cannot be reused)
+
+See [Burn-to-Claim](Burn-to-Claim.md) for the full redemption mechanism.
 
 ---
 
-## Deployment Pattern
+## Security Model
 
-Aurora Protocol uses the **Minimal Proxy Clone** pattern (EIP-1167) to optimize gas costs and ensure contract isolation.
+### Role-Based Access Control
 
-**How it works:**
+All contracts implement OpenZeppelin's **AccessControl** module with the following roles:
 
-`BatchFactory` maintains a set of implementation (logic) contracts. When a new batch is created, it deploys lightweight proxy clones that delegate all calls to the shared implementation. Each clone has its own storage, ensuring complete isolation between batches.
+| Role | Scope | Assigned To |
+|---|---|---|
+| `DEFAULT_ADMIN_ROLE` | Full administrative control | Aurora Labs multisig (post-handover) |
+| `DEPLOYER_ROLE` | Batch creation via BatchFactory | Aurora Labs deployer |
+| `OPERATOR_ROLE` | Milestone confirmations, state transitions | Aurora Labs operator |
+| `PAUSER_ROLE` | Emergency pause functionality | Aurora Labs admin |
 
-| Benefit | Description |
-|---------|-------------|
-| **Gas Efficiency** | Clone deployment costs ~10x less gas than deploying full contracts |
-| **Isolation** | Each batch operates in its own storage context — no cross-contamination |
-| **Consistency** | All batches share the same audited logic |
-| **Simplicity** | No upgrade mechanism required — each batch is immutable once deployed |
+### Post-Deployment Admin Handover
 
----
+After initial deployment and configuration, the deployer account renounces its elevated privileges and transfers administrative control to a designated multisig wallet. This ensures that no single key can unilaterally modify contract state or access controls after the system is live.
 
-## Access Control
+### Upgrade Path
 
-Aurora Protocol implements role-based access control with post-deployment admin handover to minimize centralization risk.
-
-| Role | Permissions | Assigned To |
-|------|-------------|-------------|
-| **DEFAULT_ADMIN** | Grant and revoke roles | Multi-sig (post-handover) |
-| **OPERATOR** | Create batches, approve milestones | Platform operations |
-| **ORIGINATOR** | Submit batch requests | Verified agricultural producers |
-
-After deployment and initial configuration, the deployer wallet renounces its admin privileges in favor of a multi-signature wallet, ensuring no single point of control.
+Current contracts are **non-upgradeable**. Each batch deployment is immutable once created. Protocol-level changes are introduced through new implementation contracts that future batches will clone from, while existing batches continue to operate under their original logic.
 
 ---
 
-## Contract Interaction Flow
+## Dependencies
 
-```mermaid
-sequenceDiagram
-    participant O as Originator
-    participant BF as BatchFactory
-    participant RWA as AuroraRWA1155
-    participant PS as PrimarySale
-    participant I as Investor
-    participant EV as EscrowVault
-    participant CV as ClaimVault
-
-    O->>BF: Request new batch
-    BF->>RWA: Deploy token clone
-    BF->>PS: Deploy sale clone
-    BF->>EV: Deploy escrow clone
-    BF->>CV: Deploy claim clone
-    I->>PS: Subscribe (USDC)
-    PS->>EV: Transfer pooled USDC
-    EV->>O: Release per milestone
-    O->>CV: Repay principal + yield
-    I->>CV: Burn tokens → Claim USDC
-```
+| Library | Version | Usage |
+|---|---|---|
+| OpenZeppelin Contracts | ^5.0 | ERC-1155, AccessControl, ReentrancyGuard, Pausable |
+| Solidity | ^0.8.20 | Language version |
+| EIP-1167 | — | Minimal proxy clone pattern |
 
 ---
 
-> **Next**: [EscrowVault →](EscrowVault.md)
+## Audit Status
+
+Smart contracts have **not yet been audited** by a third-party security firm. A comprehensive audit is planned prior to mainnet launch of production batches. See [Risks](../Risks.md) for details on unaudited contract risk.

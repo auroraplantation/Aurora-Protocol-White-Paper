@@ -1,108 +1,132 @@
-# Verification
+# Verification Architecture
 
-> **Aurora Protocol employs a 5-layer verification architecture to ensure that every financed agricultural batch is backed by real, validated assets and credible originators.**
-
----
-
-## Overview
-
-Trust in real-world asset (RWA) protocols depends on the quality and reliability of off-chain verification. Aurora Protocol addresses this through a layered approach that combines identity checks, agricultural data validation, financial due diligence, on-the-ground inspection, and continuous monitoring.
-
-No single layer operates in isolation — each layer reinforces the others to form a comprehensive trust framework.
+Aurora Protocol employs a **5-layer verification architecture** to bridge the trust gap between on-chain smart contracts and off-chain agricultural operations. Each layer addresses a different dimension of risk and operates at a different stage of the batch lifecycle.
 
 ---
 
-## 5-Layer Architecture
+## The Trust Problem
 
-```mermaid
-graph TB
-    L1[Layer 1 — Identity Verification]
-    L2[Layer 2 — Agricultural Data Validation]
-    L3[Layer 3 — Financial Due Diligence]
-    L4[Layer 4 — Physical Inspection]
-    L5[Layer 5 — Ongoing Monitoring]
+DeFi protocols operating with purely digital assets can verify state entirely on-chain. Real-world asset protocols face a fundamentally different challenge: the underlying asset exists in the physical world, and its status cannot be natively read by a smart contract.
 
-    L1 --> L2 --> L3 --> L4 --> L5
+Aurora Protocol must answer questions that blockchains alone cannot:
 
-    style L1 fill:#16213e,stroke:#e94560,color:#fff
-    style L2 fill:#16213e,stroke:#0f3460,color:#fff
-    style L3 fill:#16213e,stroke:#0f3460,color:#fff
-    style L4 fill:#16213e,stroke:#0f3460,color:#fff
-    style L5 fill:#16213e,stroke:#e94560,color:#fff
-```
+- Does this farm actually exist?
+- Is this originator who they claim to be?
+- Has the crop actually been planted?
+- Is the harvest actually happening?
+- Will the originator actually repay?
+
+The 5-layer verification architecture is designed to provide progressively increasing confidence across these dimensions.
 
 ---
 
-## Layer Details
+## The Five Layers
 
-### Layer 1 — Identity Verification
+### Layer 1 — Originator Identity Verification
 
-| Item | Description |
-|------|-------------|
-| **Purpose** | Confirm the legal identity and legitimacy of the Originator |
-| **Checks** | Business registration, director identification, beneficial ownership |
-| **Sources** | Government registries, third-party KYB providers |
-| **Output** | Verified Originator profile linked to on-chain wallet |
+**When:** Before batch creation
+**What:** Verification of the originator's legal identity, business registration, and operational history
 
-### Layer 2 — Agricultural Data Validation
+This layer establishes that the originator is a real, identifiable entity with a verifiable track record. Aurora Labs performs:
 
-| Item | Description |
-|------|-------------|
-| **Purpose** | Validate the agricultural basis of the financing request |
-| **Checks** | Crop type, land area, historical yield data, seasonal patterns |
-| **Sources** | Agricultural ministry records, satellite imagery, local cooperative data |
-| **Output** | Validated crop profile and production forecast |
+- Business registration verification against local registries
+- Identity verification of key principals
+- Operational history assessment (years in operation, prior financing track record)
+- Bank account and payment channel verification
+- Reference checks with supply chain partners where available
 
-### Layer 3 — Financial Due Diligence
+**Output:** Originator approved or rejected for batch creation.
 
-| Item | Description |
-|------|-------------|
-| **Purpose** | Assess the financial viability and repayment capacity of the batch |
-| **Checks** | Revenue projections, cost structure, debt-to-income ratio, repayment history |
-| **Sources** | Financial statements, bank records, prior batch performance |
-| **Output** | Financial risk score and recommended batch terms |
+### Layer 2 — Asset & Operation Verification
 
-### Layer 4 — Physical Inspection
+**When:** During batch structuring, before deployment
+**What:** Verification of the underlying agricultural operation and its economic viability
 
-| Item | Description |
-|------|-------------|
-| **Purpose** | Confirm on-the-ground conditions match submitted data |
-| **Checks** | Farm site visit, crop condition, storage facilities, equipment |
-| **Sources** | Local inspection partners, photographic evidence, GPS-tagged reports |
-| **Output** | Inspection report with approval or rejection recommendation |
+This layer confirms that the financing request is backed by a real, economically viable agricultural operation. Assessment includes:
 
-### Layer 5 — Ongoing Monitoring
+- Physical site verification (on-ground inspection or satellite imagery confirmation)
+- Crop type and growing season validation
+- Historical yield data for the region and crop type
+- Supply chain offtake arrangements (buyer contracts or market access confirmation)
+- Financial model review (cost structure, expected revenue, margin analysis)
 
-| Item | Description |
-|------|-------------|
-| **Purpose** | Track batch progress through the milestone lifecycle |
-| **Checks** | Planting confirmation, growth progress, harvest verification, delivery confirmation |
-| **Sources** | Periodic field reports, satellite monitoring, buyer confirmations |
-| **Output** | Milestone verification data fed into `EscrowVault` state transitions |
+**Output:** Batch parameters finalized and approved for deployment.
+
+### Layer 3 — Milestone Evidence Verification
+
+**When:** At each milestone during the batch lifecycle
+**What:** Real-time verification that milestone conditions have been met before fund release
+
+This is the most operationally critical layer. At each milestone, the originator submits evidence that the milestone has been achieved. Evidence types include:
+
+- **Milestone 1 (Planting):** Planting confirmation photos, seed/input purchase receipts, agronomist reports
+- **Milestone 2 (Growth):** Growth-stage inspection photos, satellite imagery updates, input application records
+- **Milestone 3 (Harvest):** Harvest documentation, warehouse receipts, buyer delivery confirmations, sales invoices
+
+Aurora Labs verifies this evidence through a combination of:
+- Direct inspection by local field agents
+- Third-party agronomist review
+- Satellite and remote sensing data cross-referencing
+- Document authenticity verification
+
+**Output:** Milestone confirmed on-chain, triggering fund release via EscrowVault.
+
+### Layer 4 — Financial Reconciliation
+
+**When:** Post-harvest, before returns distribution
+**What:** Verification that the originator's repayment matches the agreed terms
+
+This layer ensures that the financial settlement is accurate and complete:
+
+- Confirmation that the originator's return deposit matches the agreed amount
+- Reconciliation of actual sales proceeds against projected returns
+- Platform fee calculation and deduction verification
+- ClaimVault balance confirmation before opening claims
+
+**Output:** ClaimVault funded and claims enabled for token holders.
+
+### Layer 5 — Continuous Monitoring & Oracle Integration
+
+**When:** Throughout the batch lifecycle
+**What:** Ongoing risk monitoring and anomaly detection
+
+This layer provides continuous oversight beyond discrete milestone checkpoints:
+
+- **Weather and climate monitoring** — Tracking adverse weather events, drought, flooding, or pest outbreaks that could impact crop performance
+- **Market price monitoring** — Tracking commodity prices relevant to the batch's crop type
+- **Originator behavior monitoring** — Unusual activity patterns, communication gaps, or early warning signals
+- **Oracle integration** — Where available, integration with third-party data oracles for automated data feeds (weather data, commodity prices, satellite indices)
+
+**Output:** Risk alerts and early intervention triggers for Aurora Labs operators.
 
 ---
 
-## Verification Summary
+## Verification vs. Guarantee
 
-| Layer | Focus | Timing | Data Source |
-|-------|-------|--------|-------------|
-| **L1** — Identity | Who is the Originator? | Pre-onboarding | KYB providers, registries |
-| **L2** — Agricultural | What is being financed? | Pre-batch | Agri data, satellite |
-| **L3** — Financial | Can they repay? | Pre-batch | Financial records |
-| **L4** — Physical | Is it real? | Pre-funding | On-site inspection |
-| **L5** — Monitoring | Is it progressing? | Post-funding | Field reports, remote sensing |
+It is important to note that verification reduces risk but does not eliminate it. Aurora Protocol's verification architecture provides:
 
----
+- **Reasonable assurance** that the originator and operation are legitimate
+- **Evidence-based confirmation** of milestone progress
+- **Continuous monitoring** for emerging risks
 
-## Current Status and Roadmap
+It does **not** provide:
 
-> **Current state**: Verification processes are executed manually by the Aurora operations team with support from local partners in Southeast Asia.
+- A guarantee of originator repayment
+- Insurance against crop failure, natural disaster, or market collapse
+- Legal enforcement of off-chain agreements (this is handled through separate legal frameworks)
 
-> **Planned enhancements**:
-> - Integration with third-party KYC/KYB providers for automated identity verification
-> - Oracle-based data feeds for agricultural and weather data
-> - On-chain attestation of verification results for public auditability
+See [Risks](../Risks.md) for a full discussion of residual risks and [Originator Security](../Economics/Originator-Security.md) for the $AUR staking mechanism that provides additional loss mitigation.
 
 ---
 
-> **Next**: [Unit Economics →](../Economics/Unit-Economics.md)
+## Current Status & Roadmap
+
+| Layer | Current Implementation | Planned Enhancement |
+|---|---|---|
+| Layer 1 — Identity | Manual verification by Aurora Labs | KYC/AML integration with third-party providers |
+| Layer 2 — Asset | Manual inspection + documentation | Satellite imagery API integration |
+| Layer 3 — Milestone | Manual evidence review | Automated evidence scoring; decentralized verification network |
+| Layer 4 — Financial | Manual reconciliation | Automated USDC flow tracking |
+| Layer 5 — Monitoring | Manual monitoring | Oracle-based automated alerts; IoT sensor integration |
+
+Aurora Protocol's verification architecture is designed to become progressively more automated and decentralized over time, while maintaining human oversight at critical decision points.

@@ -1,102 +1,144 @@
 # EscrowVault
 
-> **The EscrowVault contract governs milestone-based fund disbursement through a strict 7-state machine, ensuring investor capital is released only upon verified project progress.**
-
----
-
-## Overview
-
-`EscrowVault` is the custodial core of Aurora Protocol. It holds pooled `USDC` from investor subscriptions and releases funds to the Originator incrementally as predefined milestones are verified and approved. The contract enforces a deterministic state machine that prevents unauthorized withdrawals and ensures transparent fund management.
+The EscrowVault is the core fund management contract in Aurora Protocol. It implements a **7-state finite state machine** that governs the complete lifecycle of batch capital — from initial deposit through milestone-based disbursement to final settlement or failure recovery.
 
 ---
 
 ## State Machine
 
-The EscrowVault operates through **7 distinct states** with strictly defined transitions:
-
-```mermaid
-stateDiagram-v2
-    [*] --> Empty
-    Empty --> Funding : Sale opens
-    Funding --> Funded : Target reached
-    Funding --> Failed : Deadline missed
-    Funded --> Milestone1 : M1 verified
-    Funded --> Failed : Batch cancelled
-    Milestone1 --> Milestone2 : M2 verified
-    Milestone1 --> Failed : M1 failed
-    Milestone2 --> Milestone3 : M3 verified
-    Milestone2 --> Failed : M2 failed
-    Milestone3 --> [*] : Complete
-    Failed --> [*] : Refunds processed
+```
+                 ┌────────┐
+                 │ Empty  │
+                 └───┬────┘
+                     │ PrimarySale deposits funds
+                     ▼
+                 ┌────────┐
+           ┌─────│Funding │─────┐
+           │     └───┬────┘     │
+           │         │ target   │ target not met /
+           │         │ reached  │ window expired
+           │         ▼         │
+           │     ┌────────┐     │
+           │     │ Funded │     │
+           │     └───┬────┘     │
+           │         │ M1       │
+           │         │ confirmed│
+           │         ▼         │
+           │   ┌───────────┐    │
+           │   │Milestone 1│    │
+           │   └─────┬─────┘    │
+           │         │ M2       │
+           │         │ confirmed│
+           │         ▼         │
+           │   ┌───────────┐    │
+           │   │Milestone 2│    │
+           │   └─────┬─────┘    │
+           │         │ M3       │
+           │         │ confirmed│
+           │         ▼         │
+           │   ┌───────────┐    │
+           │   │Milestone 3│    │
+           │   └───────────┘    │
+           │                    │
+           │     ┌────────┐     │
+           └────►│ Failed │◄────┘
+                 └────────┘
 ```
 
 ---
 
 ## State Definitions
 
-| State | Description | Allowed Transitions |
-|-------|-------------|---------------------|
-| **Empty** | Initial state. Vault deployed but no funds received. | → Funding |
-| **Funding** | Primary sale is active. USDC flowing in from investors. | → Funded, → Failed |
-| **Funded** | Funding target reached. Capital locked, awaiting first milestone. | → Milestone1, → Failed |
-| **Milestone1** | First milestone verified. First tranche released to Originator. | → Milestone2, → Failed |
-| **Milestone2** | Second milestone verified. Second tranche released. | → Milestone3, → Failed |
-| **Milestone3** | Final milestone verified. Final tranche released. Batch complete. | → Terminal |
-| **Failed** | Batch has failed at any eligible stage. Refund process initiated. | → Terminal |
+| State | Description |
+|---|---|
+| **Empty** | Initial state. The vault has been deployed but contains no funds. |
+| **Funding** | The PrimarySale is active. Funds are being deposited by participants. |
+| **Funded** | The funding target has been reached. Sale is closed. Funds are locked and awaiting first milestone confirmation. |
+| **Milestone 1** | First tranche has been released to the originator (e.g., planting phase funded). |
+| **Milestone 2** | Second tranche released (e.g., growth/maintenance phase funded). |
+| **Milestone 3** | Final tranche released. Batch lifecycle is complete. Returns are expected from the originator. |
+| **Failed** | Terminal failure state. Triggered by funding shortfall, originator default, or operational failure. |
 
 ---
 
-## Transition Rules
+## State Transitions
 
-The following rules govern all state transitions:
+### Valid Transitions
 
-| Rule | Description |
-|------|-------------|
-| **Forward-Only** | States progress sequentially — no skipping from Funding to Milestone2 |
-| **No Reversal** | Once a milestone is confirmed, the vault cannot return to a prior state |
-| **Failure Access** | Failed state is reachable from Funding, Funded, Milestone1, and Milestone2 only |
-| **Failure Exclusions** | Empty, Milestone3, and Failed itself **cannot** transition to Failed |
-| **Single Terminal** | Both Milestone3 (success) and Failed (failure) are terminal states |
-| **Operator-Gated** | Milestone transitions require OPERATOR role approval |
+| From | To | Trigger |
+|---|---|---|
+| Empty | Funding | PrimarySale contract initiates the batch |
+| Funding | Funded | Funding target reached within the sale window |
+| Funding | Failed | Sale window expires without reaching target |
+| Funded | Milestone 1 | Operator confirms M1 evidence |
+| Funded | Failed | Originator defaults or batch is cancelled |
+| Milestone 1 | Milestone 2 | Operator confirms M2 evidence |
+| Milestone 1 | Failed | Originator defaults at M1 |
+| Milestone 2 | Milestone 3 | Operator confirms M3 evidence |
+| Milestone 2 | Failed | Originator defaults at M2 |
 
----
+### Invalid Transitions
 
-## Fund Release Schedule
+The following transitions are explicitly prohibited by the contract:
 
-Each milestone release corresponds to a predefined percentage of the total pooled capital:
-
-| Milestone | Typical Phase | Release % | Cumulative |
-|-----------|---------------|-----------|------------|
-| **Milestone 1** | Planting / Procurement | 30% | 30% |
-| **Milestone 2** | Growing / Processing | 35% | 65% |
-| **Milestone 3** | Harvest / Delivery | 35% | 100% |
-
-> *Note: Release percentages are configurable per batch at creation time and may vary based on crop type and project structure.*
+- **Empty → Failed** — A batch with no funds cannot fail; it simply remains uninitialized.
+- **Milestone 3 → Failed** — Once all milestones are complete, the batch has succeeded. Failure is no longer a valid state.
+- **Failed → any state** — Failed is a terminal state. No recovery or restart is possible.
+- **Any backward transition** — States are strictly sequential. A batch cannot move from Milestone 2 back to Milestone 1.
 
 ---
 
-## Failure and Refund Mechanism
+## Fund Release Mechanics
 
-When a batch enters the **Failed** state:
+Each milestone transition triggers a proportional fund release to the originator. The release schedule is defined at batch creation and encoded in the contract.
 
-1. All remaining `USDC` in the vault is locked for refund processing
-2. Investors can call `refund()` to reclaim their pro-rata share of remaining funds
-3. Any tranches already released to the Originator prior to failure are **not recoverable** through the smart contract — this risk is mitigated by the Originator's staking collateral (see [Originator Security](../Economics/Originator-Security.md))
-4. RWA tokens remain in investor wallets but carry no further claim value
+**Example 3-milestone schedule:**
 
----
+| Milestone | Tranche | Cumulative Release |
+|---|---|---|
+| Milestone 1 | 30% | 30% |
+| Milestone 2 | 35% | 65% |
+| Milestone 3 | 35% | 100% |
 
-## Key Functions
-
-| Function | Access | Description |
-|----------|--------|-------------|
-| `initialize()` | BatchFactory | Sets batch parameters, milestone percentages, and deadlines |
-| `fund()` | PrimarySale | Receives USDC from completed primary sale |
-| `releaseMilestone()` | OPERATOR | Advances state and releases tranche to Originator |
-| `markFailed()` | OPERATOR | Transitions vault to Failed state |
-| `refund()` | Investor | Claims pro-rata refund in Failed state |
-| `getState()` | Public | Returns current vault state |
+At each release:
+1. The platform fee (max 3%) is deducted from the tranche amount
+2. The net amount is transferred to the originator's designated wallet
+3. The state transition is recorded on-chain with a timestamp
 
 ---
 
-> **Next**: [Burn-to-Claim →](Burn-to-Claim.md)
+## Failure Handling
+
+When a batch transitions to the **Failed** state:
+
+1. **Remaining funds** in the EscrowVault become available for participant withdrawal
+2. **Each participant** can call a withdrawal function to reclaim their proportional share of the remaining balance
+3. **Funds already released** in prior milestones are not recoverable through the smart contract — these are subject to off-chain recovery processes and originator staking penalties
+
+The participant's recoverable amount in a failure scenario is:
+
+```
+recoverable = (participant_tokens / total_tokens) × remaining_vault_balance
+```
+
+---
+
+## Access Control
+
+| Action | Required Role |
+|---|---|
+| Initialize vault | BatchFactory (deployment only) |
+| Transition: Funding → Funded | Automatic (triggered by PrimarySale) |
+| Transition: Funded → Milestone N | `OPERATOR_ROLE` |
+| Transition: Any → Failed | `OPERATOR_ROLE` |
+| Withdraw (failure) | Any token holder |
+| Emergency pause | `PAUSER_ROLE` |
+
+---
+
+## Security Properties
+
+- **No manual fund extraction** — There is no administrative function to withdraw funds outside of the defined state machine logic.
+- **Reentrancy protection** — All fund transfer functions are guarded by OpenZeppelin's `ReentrancyGuard`.
+- **Single-direction state flow** — The state machine enforces strictly forward transitions, preventing replay or regression attacks.
+- **Immutable schedule** — The milestone amounts and release percentages are set at deployment and cannot be modified after initialization.
