@@ -1,74 +1,104 @@
 # Originator Security
 
-> **Aurora Protocol requires originators to stake collateral as a commitment mechanism, aligning their incentives with investor protection and batch performance.**
+Aurora Protocol implements an **originator staking requirement** using the $AUR governance token to align originator incentives with platform performance and provide a first-loss buffer for DeFi participants.
 
 ---
 
-## Overview
+## The Incentive Problem
 
-In any RWA financing protocol, the risk of originator default or misconduct is a primary concern. Aurora Protocol mitigates this risk through a mandatory staking requirement: originators must lock collateral before their batch can proceed to primary sale.
+In agricultural financing, the originator receives capital upfront and repays later. This creates a temporal asymmetry: the participant bears capital risk from the moment of investment, while the originator's obligation is deferred. Without a counterbalancing mechanism, this asymmetry favors originators who may underperform, delay repayment, or default.
 
-This mechanism serves as both a financial commitment and a behavioral incentive — originators with capital at stake are more likely to fulfill their obligations and deliver on milestones.
-
----
-
-## Staking Mechanism
-
-### How It Works
-
-1. **Pre-Batch Requirement**: Before a batch is approved for primary sale, the Originator must deposit a staking amount into the protocol
-2. **Lock Period**: The stake remains locked for the entire duration of the batch lifecycle — from funding through final repayment
-3. **Release on Completion**: Upon successful completion of all milestones and full repayment, the stake is returned to the Originator
-4. **Forfeiture on Failure**: If the batch enters a **Failed** state, part or all of the stake may be forfeited and distributed to affected investors as partial compensation
+Traditional finance addresses this through collateral requirements, credit scoring, and legal enforcement. Aurora Protocol supplements its [verification architecture](../Protocol/Verification.md) with an on-chain economic mechanism: **$AUR staking**.
 
 ---
 
-## Staking Parameters
+## How It Works
 
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| **Staking Token** | `$AUR` (planned) | Governance token — acts as entry gate |
-| **Minimum Stake** | TBD | To be determined based on batch size tiers |
-| **Lock Duration** | Full batch lifecycle | Release upon successful repayment |
-| **Forfeiture Trigger** | Batch enters Failed state | Partial or full forfeiture |
-| **Forfeiture Distribution** | Pro-rata to affected investors | Proportional to token holdings |
+### Staking Gate
 
-> *Note: The `$AUR` governance token has not yet been issued. During the pre-token phase, staking requirements may be fulfilled through alternative collateral arrangements as determined by the platform.*
+Before an originator can have a batch deployed on Aurora Protocol, they must stake a defined amount of $AUR tokens. This staked amount is locked for the duration of the batch lifecycle and serves as:
 
----
+1. **Skin in the game** — The originator has direct economic exposure to the batch's success or failure
+2. **First-loss buffer** — In the event of default, staked $AUR can be liquidated to partially compensate participants
+3. **Quality signal** — The willingness to stake tokens demonstrates originator confidence in their own operation
 
-## Incentive Alignment
+### Staking Parameters
 
-| Stakeholder | Incentive |
-|-------------|-----------|
-| **Originator** | Staking creates direct financial exposure to batch success — discourages negligence and fraud |
-| **Investor** | Staking provides a first-loss buffer — partial protection against originator default |
-| **Platform** | Staking raises the quality bar for originators — only committed producers participate |
+| Parameter | Description |
+|---|---|
+| Staking token | $AUR (Aurora governance token) |
+| Staking amount | Defined per batch, proportional to financing amount |
+| Lock period | Duration of the batch lifecycle (from deployment to Milestone 3 completion or failure resolution) |
+| Release condition | Full repayment of returns to the ClaimVault |
+| Slash condition | Batch enters Failed state with unreleased escrow funds |
 
----
+### Lifecycle
 
-## Risk Mitigation Matrix
-
-| Risk | Mitigation via Staking |
-|------|------------------------|
-| **Originator abandons batch** | Forfeited stake compensates investors |
-| **Milestone fraud** | Staked capital at risk incentivizes honest reporting |
-| **Repeated bad actors** | Forfeiture history disqualifies originators from future batches |
-| **Under-collateralized batch** | Minimum stake requirements scaled to batch size |
-
----
-
-## Future Enhancements
-
-As the `$AUR` token ecosystem matures, the staking mechanism will evolve:
-
-| Enhancement | Description |
-|-------------|-------------|
-| **Tiered Staking** | Higher-tier originators (based on track record) may qualify for reduced staking requirements |
-| **Staking Rewards** | Successful originators may earn additional `$AUR` rewards for on-time repayment |
-| **Delegated Staking** | Third parties may stake on behalf of originators, expanding access for smaller producers |
-| **Slashing Conditions** | Formalized on-chain slashing rules for specific failure scenarios |
+```
+   Originator stakes $AUR
+           │
+           ▼
+   Batch deployed ──── Batch succeeds ──── $AUR returned to originator
+           │
+           └──── Batch fails ──── $AUR slashed (partial/full)
+                                      │
+                                      ▼
+                              Proceeds distributed to
+                              affected participants
+```
 
 ---
 
-> **Next**: [Points Program →](Points-Program.md)
+## Slashing Mechanics
+
+If a batch transitions to the **Failed** state:
+
+1. The originator's staked $AUR is marked for slashing
+2. The slashed $AUR is liquidated (sold for USDC) through a defined process
+3. Liquidation proceeds are distributed proportionally to affected token holders
+4. Slashing occurs automatically per the smart contract logic — no manual intervention is required
+
+### Slashing Limitations
+
+The staked $AUR provides **partial** loss mitigation, not full insurance. The recoverable amount depends on:
+
+- The staking ratio relative to the batch size
+- The market price of $AUR at the time of liquidation
+- The portion of escrow funds already released to the originator prior to failure
+
+Aurora Protocol does not guarantee that slashing proceeds will cover participant losses. See [Risks](../Risks.md).
+
+---
+
+## Staking as Reputation
+
+Beyond its economic function, originator staking creates a **reputation signal**:
+
+- Originators with a track record of successful batches accumulate unlocked $AUR, demonstrating reliability
+- Repeat originators may access better terms (lower staking ratios, larger batch sizes) as their on-chain track record grows
+- First-time originators must meet higher staking thresholds to compensate for the lack of historical performance data
+
+This creates a natural progression from higher-friction, higher-collateral early batches to more efficient, relationship-based financing over time.
+
+---
+
+## $AUR Token Status
+
+The $AUR governance token has **not yet been issued**. It is planned as a separate future token launch, distinct from RWA batch tokens. Key details:
+
+- $AUR will function as a governance and utility token for the Aurora Protocol ecosystem
+- $AUR is used as the **airdrop weight** for the [Aurora Points Program](Points-Program.md) — points earned by participants will convert to $AUR allocation at a future token generation event
+- The originator staking mechanism will be activated when $AUR is live
+
+Until $AUR is issued, originator security is managed through off-chain agreements, verification processes, and Aurora Labs' operational oversight.
+
+---
+
+## Design Rationale
+
+| Alternative | Why Not |
+|---|---|
+| USDC collateral | Reduces originator's working capital; defeats the purpose of providing financing |
+| NFT-based reputation only | No economic consequence for poor performance |
+| Third-party insurance | Expensive, slow, and not available for most Southeast Asian agricultural operations |
+| **$AUR staking** | **Aligns incentives, creates economic consequences, builds reputation, and connects to protocol governance** |

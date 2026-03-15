@@ -1,91 +1,123 @@
 # Unit Economics
 
-> **A transparent breakdown of how value flows through a single Aurora Protocol financing batch — from investor subscription to final redemption.**
+This section describes the economic structure of a single Aurora Protocol batch — the fundamental unit of financing on the platform. Understanding batch-level economics is essential for both DeFi participants evaluating investment opportunities and originators structuring financing requests.
 
 ---
 
-## Overview
+## Batch as Economic Unit
 
-Each batch on Aurora Protocol operates as an independent economic unit. Understanding the unit economics of a single batch is essential for investors evaluating returns and for originators assessing the cost of capital.
+Each batch on Aurora Protocol is a self-contained financing operation with its own:
 
-This section models the economics of a representative batch to illustrate the fee structure, yield mechanics, and net returns to each participant.
+- Funding target (denominated in USDC)
+- Token supply and price
+- Milestone schedule and release percentages
+- Fee structure
+- Expected return profile
+- Independent risk profile
+
+There is no portfolio-level pooling, cross-subsidization, or shared liability between batches. Each batch succeeds or fails on its own merits.
 
 ---
 
-## Representative Batch Model
+## Illustrative Batch Structure
+
+The following example illustrates the economics of a typical agricultural financing batch:
+
+### Batch Parameters
 
 | Parameter | Value |
-|-----------|-------|
-| **Batch Size** | $100,000 USDC |
-| **Token Supply** | 10,000 RWA Tokens |
-| **Token Price** | $10 USDC per token |
-| **Batch Duration** | 6 months |
-| **Gross Yield (Originator-Paid)** | 12% annualized (6% for 6-month term) |
-| **Platform Fee** | 2.5% of batch size (one-time) |
+|---|---|
+| Crop Type | Thai Jasmine Rice |
+| Financing Amount | 100,000 USDC |
+| Token Supply | 10,000 RWA tokens |
+| Token Price | 10 USDC |
+| Batch Duration | 6 months (1 crop cycle) |
+| Expected Gross Return | 12% annualized (6% for the 6-month cycle) |
+| Platform Fee | 2.5% (of principal, deducted at milestone release) |
 
----
+### Fund Flow
 
-## Cash Flow Breakdown
-
-### Investor Perspective
-
-| Item | Amount (USDC) | Calculation |
-|------|---------------|-------------|
-| Investment | 100,000 | Subscription total |
-| Gross Return | 106,000 | 100,000 × (1 + 6%) |
-| Platform Fee | 0 | Borne by Originator, not investors |
-| **Net Payout to Investors** | **106,000** | Principal + yield |
-| **Net Yield** | **6.0%** | Over 6-month term |
-
-### Originator Perspective
-
-| Item | Amount (USDC) | Calculation |
-|------|---------------|-------------|
-| Capital Received | 97,500 | 100,000 − 2,500 (platform fee) |
-| Repayment Obligation | 106,000 | 100,000 principal + 6,000 yield |
-| Platform Fee | 2,500 | 2.5% of batch size |
-| **Total Cost of Capital** | **8,500** | Yield + fee |
-| **Effective Cost Rate** | **8.72%** | 8,500 / 97,500 (annualized: ~17.4%) |
-
-### Platform Perspective
-
-| Item | Amount (USDC) | Calculation |
-|------|---------------|-------------|
-| **Platform Fee Revenue** | **2,500** | 2.5% × 100,000 |
-
----
-
-## Value Flow Diagram
-
-```mermaid
-graph LR
-    I[Investors] -->|100,000 USDC| PS[PrimarySale]
-    PS -->|97,500 USDC| EV[EscrowVault]
-    PS -->|2,500 USDC| P[Platform Treasury]
-    EV -->|Released per Milestone| O[Originator]
-    O -->|106,000 USDC Repayment| CV[ClaimVault]
-    CV -->|106,000 USDC| I
+```
+DeFi Participants
+       │
+       │ 100,000 USDC
+       ▼
+   PrimarySale
+       │
+       │ 100,000 USDC
+       ▼
+   EscrowVault ──────── Platform Fee: 2,500 USDC ──────► Aurora Labs
+       │
+       │ 97,500 USDC (net to originator across 3 milestones)
+       ▼
+   Originator
+       │
+       │ 106,000 USDC (principal + yield)
+       ▼
+   ClaimVault
+       │
+       │ 106,000 USDC (distributed via burn-to-claim)
+       ▼
+DeFi Participants
 ```
 
+### Participant Returns
+
+| Metric | Value |
+|---|---|
+| Investment per token | 10 USDC |
+| Return per token (if successful) | 10.60 USDC |
+| Net yield per token | 0.60 USDC (6% for 6-month cycle) |
+| Annualized yield (gross) | ~12% |
+| Platform fee borne by | Originator (deducted from disbursement) |
+
+### Originator Economics
+
+| Metric | Value |
+|---|---|
+| Financing received (net of fee) | 97,500 USDC |
+| Repayment obligation | 106,000 USDC |
+| Effective cost of capital | ~8.7% for 6 months (~17.4% annualized) |
+| Platform fee paid | 2,500 USDC |
+
 ---
 
-## Fee Structure
+## Fee Deduction Mechanics
 
-| Fee Type | Rate | Paid By | When |
-|----------|------|---------|------|
-| **Platform Fee** | ≤ 3% of batch size | Originator | Deducted at funding |
-| **Gas Fees** | Variable (Ethereum) | Transaction initiator | Per transaction |
-| **Subscription Fee** | None | — | — |
-| **Redemption Fee** | None | — | — |
+The platform fee is deducted from each milestone tranche as funds are released from the EscrowVault. This means the fee is distributed across the batch lifecycle rather than front-loaded.
 
-> *The platform fee is the sole protocol-level revenue source. There are no hidden fees, performance fees, or management fees charged to investors.*
+**Example with 3 milestones (30/35/35 split):**
+
+| Milestone | Gross Release | Fee (2.5%) | Net to Originator |
+|---|---|---|---|
+| Milestone 1 | 30,000 USDC | 750 USDC | 29,250 USDC |
+| Milestone 2 | 35,000 USDC | 875 USDC | 34,125 USDC |
+| Milestone 3 | 35,000 USDC | 875 USDC | 34,125 USDC |
+| **Total** | **100,000 USDC** | **2,500 USDC** | **97,500 USDC** |
 
 ---
 
 ## Yield Disclaimer
 
-> **Important**: Yield figures in this section are illustrative examples only. Actual yields vary by batch and are determined by the specific terms agreed between the Originator and the platform. Past batch performance does not guarantee future results. Agricultural financing carries inherent risks — see [Risks](../Risks.md) for a full discussion.
+Projected yields are **estimates based on the originator's expected crop economics** and are not guaranteed. Actual returns depend on:
+
+- Crop performance and harvest quality
+- Commodity market prices at the time of sale
+- Originator's operational execution
+- External factors (weather, logistics, policy changes)
+- Originator's ability and willingness to repay
+
+A batch may return less than projected, return only the principal, or result in partial or total loss of capital. See [Risks](../Risks.md) for full risk disclosures.
 
 ---
 
-> **Next**: [Business Model →](Business-Model.md)
+## Comparison with Traditional Agricultural Finance
+
+| Dimension | Traditional | Aurora Protocol |
+|---|---|---|
+| Minimum investment | $50,000–$500,000+ | As low as 1 token (~$10 equivalent) |
+| Geographic access | Local banks, regional DFIs | Global, permissionless |
+| Transparency | Quarterly reports, limited visibility | Real-time on-chain state |
+| Settlement | 30–90 day manual processes | Deterministic smart contract execution |
+| Intermediaries | Multiple (banks, brokers, agents) | Direct participant-to-originator via smart contract |
+| Liquidity | Illiquid, fixed-term commitments | Currently illiquid; secondary market planned |
