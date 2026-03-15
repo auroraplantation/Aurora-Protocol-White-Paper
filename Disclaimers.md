@@ -1,89 +1,98 @@
 # Disclaimers
 
-> **Please read the following disclaimers carefully before using Aurora Protocol or participating in any financing batch.**
+This document sets forth the legal disclaimers applicable to Aurora Protocol, the Aurora Protocol white paper, and all related documentation published by Aurora Digital Labs Limited.
 
 ---
 
 ## General Disclaimer
 
-This whitepaper and all associated documentation are published by Aurora Digital Labs Limited for informational purposes only. Nothing contained herein constitutes financial advice, investment advice, legal advice, tax advice, or a solicitation to buy, sell, or hold any digital asset, token, or security.
-
----
-
-## No Offer of Securities
-
-> **RWA participation tokens, Aurora Points, and any future `$AUR` governance tokens are not intended to constitute securities, shares, units in a collective investment scheme, or any other form of regulated financial instrument in any jurisdiction.**
-
-The sale or distribution of tokens does not represent an initial public offering, a securities offering, or a regulated fundraising event. Prospective participants should consult their own legal and financial advisors to determine the regulatory status of these tokens in their jurisdiction.
-
----
-
-## Forward-Looking Statements
-
-This whitepaper contains forward-looking statements regarding Aurora Protocol's planned features, roadmap, market projections, and business strategy. These statements are based on current expectations and assumptions and are subject to significant risks, uncertainties, and changes.
-
-Forward-looking statements include, but are not limited to, statements about:
-
-- Planned product features and protocol enhancements
-- Market opportunity estimates and growth projections
-- `$AUR` token issuance and governance plans
-- Regulatory and compliance developments
-- Fundraising targets and use of proceeds
-
-> **Aurora Digital Labs Limited makes no guarantee that any forward-looking statement will be realized. Actual results may differ materially from those expressed or implied.**
+This white paper and all associated documentation are provided for **informational purposes only**. They do not constitute an offer, solicitation, or recommendation to purchase, sell, or hold any digital asset, token, security, or financial instrument. Nothing in this documentation should be construed as investment, financial, legal, tax, or other professional advice.
 
 ---
 
 ## No Guarantee of Returns
 
-Participation in Aurora Protocol financing batches involves significant risk, including the possible loss of the entire invested amount. Yield figures presented in this whitepaper are illustrative examples only and do not represent guaranteed, promised, or expected returns.
+Aurora Protocol does not guarantee any return on investment, yield, or financial outcome. Projected yields, illustrative examples, and financial models presented in this documentation are **estimates only** and are based on assumptions that may not materialize. Actual outcomes may differ materially from any projections or illustrations.
 
-Past performance of any batch, originator, or agricultural project does not guarantee or predict future results.
-
----
-
-## Technology Risks
-
-Aurora Protocol's smart contracts have not yet undergone a formal third-party security audit. While the protocol is built using industry-standard frameworks (OpenZeppelin, Solidity ^0.8.20), there may be undiscovered vulnerabilities, bugs, or exploits that could result in partial or total loss of funds.
-
-The protocol operates on the Ethereum blockchain and is subject to network risks including congestion, high gas costs, and potential protocol-level changes.
+Participation in any Aurora Protocol batch may result in **partial or total loss of capital**.
 
 ---
 
-## Regulatory Uncertainty
+## Forward-Looking Statements
 
-The regulatory environment for digital assets, tokenized securities, and decentralized finance is evolving and varies by jurisdiction. There is no assurance that Aurora Protocol's current structure will remain compliant with future regulatory requirements. Changes in law or regulatory interpretation may adversely affect the protocol's operations, the legal status of tokens, or participants' ability to use the platform.
+This documentation contains forward-looking statements regarding Aurora Protocol's planned features, roadmap, development milestones, token launches, and business strategy. These statements are based on current expectations and assumptions and are subject to risks, uncertainties, and changes. Aurora Digital Labs Limited does not undertake any obligation to update forward-looking statements to reflect subsequent events or circumstances.
+
+Forward-looking statements include, but are not limited to, references to:
+
+- The $AUR governance token (not yet issued)
+- Secondary market functionality (not yet implemented)
+- KYC/AML integration (not yet implemented)
+- Geographic expansion plans
+- Decentralized governance structures
+- Oracle and automated verification integration
+
+There is no assurance that any of these planned features or milestones will be achieved on the described timeline, in the described form, or at all.
 
 ---
 
-## Stablecoin Risk
+## No Audit
 
-All protocol transactions are denominated in `USDC`, a centralized stablecoin issued by Circle. `USDC` is subject to issuer risk, including the possibility of address freezing, blacklisting, or de-pegging from USD. Aurora Protocol has no control over Circle's operational decisions or the stability of the `USDC` peg.
-
----
-
-## No Professional Relationship
-
-Use of Aurora Protocol does not create a fiduciary, advisory, professional, or agency relationship between the user and Aurora Digital Labs Limited, its founders, team members, or affiliates.
-
----
-
-## Limitation of Liability
-
-To the maximum extent permitted by applicable law, Aurora Digital Labs Limited and its directors, officers, employees, and affiliates shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages arising from or related to the use of Aurora Protocol, participation in any financing batch, or reliance on information in this whitepaper.
+Aurora Protocol's smart contracts have **not been audited** by a third-party security firm as of the date of this publication. Unaudited smart contracts may contain vulnerabilities, bugs, or logic errors. Participation in a protocol with unaudited contracts carries additional risk.
 
 ---
 
 ## Jurisdictional Restrictions
 
-Aurora Protocol may not be available or appropriate for use in all jurisdictions. It is the responsibility of each participant to determine whether their use of the protocol complies with applicable local laws and regulations. Persons in jurisdictions where participation in tokenized financing or digital asset platforms is prohibited or restricted should not use Aurora Protocol.
+Aurora Protocol does not target or solicit participation from individuals or entities in jurisdictions where such participation would be prohibited or restricted by law. It is the sole responsibility of each participant to determine whether their participation complies with the laws of their jurisdiction.
+
+Aurora Digital Labs Limited makes no representation that the services, tokens, or materials described in this documentation are appropriate, available, or legally permissible in any particular jurisdiction.
 
 ---
 
-## Amendments
+## No Fiduciary Relationship
 
-Aurora Digital Labs Limited reserves the right to update, modify, or replace this whitepaper and any associated documentation at any time without prior notice. Participants are encouraged to review the latest version available at [auroraworlds.com](https://auroraworlds.com).
+Use of Aurora Protocol does not create a fiduciary relationship, partnership, joint venture, employment, or agency relationship between participants and Aurora Digital Labs Limited, Aurora Labs, or any of their affiliates, officers, directors, or employees.
 
 ---
 
-> *Last updated: March 2026*
+## Third-Party Dependencies
+
+Aurora Protocol relies on third-party infrastructure and services, including but not limited to:
+
+- Ethereum blockchain network
+- USDC stablecoin (issued by Circle)
+- OpenZeppelin smart contract libraries
+- Web3 wallet providers
+- Third-party data and verification services
+
+Aurora Digital Labs Limited does not control, guarantee, or assume liability for the performance, availability, security, or regulatory compliance of any third-party service or infrastructure.
+
+---
+
+## Limitation of Liability
+
+To the maximum extent permitted by applicable law, Aurora Digital Labs Limited, its affiliates, officers, directors, employees, agents, and advisors shall not be liable for any direct, indirect, incidental, consequential, special, or exemplary damages arising from or related to participation in Aurora Protocol, including but not limited to loss of capital, loss of data, loss of profits, or any other financial loss.
+
+---
+
+## Modification
+
+Aurora Digital Labs Limited reserves the right to modify, update, or replace this white paper and all associated documentation at any time without prior notice. Continued participation in Aurora Protocol following any such modification constitutes acceptance of the revised terms. Participants are advised to review this documentation periodically.
+
+---
+
+## Governing Law
+
+This documentation and any disputes arising from or relating to Aurora Protocol shall be governed by and construed in accordance with the laws of the Hong Kong Special Administrative Region, without regard to conflict of law principles.
+
+---
+
+## Contact
+
+For questions regarding this documentation or Aurora Protocol:
+
+**Aurora Digital Labs Limited**
+Hong Kong
+
+**Website:** [auroraworlds.com](https://auroraworlds.com)
+**Email:** [support@auroraworlds.com](mailto:support@auroraworlds.com)

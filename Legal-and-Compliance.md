@@ -1,98 +1,115 @@
 # Legal and Compliance
 
-> **Aurora Protocol operates under Aurora Digital Labs Limited, incorporated in Hong Kong, and is designed to comply with applicable digital asset regulations including the Securities and Futures Ordinance (Cap. 617).**
+Aurora Protocol is developed and operated by **Aurora Digital Labs Limited**, a company incorporated in Hong Kong. The protocol is designed to operate within the regulatory frameworks applicable to digital assets, virtual asset services, and financial technology in Hong Kong and relevant Southeast Asian jurisdictions.
 
 ---
 
-## Corporate Structure
+## Jurisdiction
 
-| Item | Detail |
-|------|--------|
-| **Legal Entity** | Aurora Digital Labs Limited |
-| **Jurisdiction** | Hong Kong Special Administrative Region |
-| **Type** | Limited Company |
-| **Primary Regulation** | Securities and Futures Ordinance (Cap. 617) |
-| **Website** | [auroraworlds.com](https://auroraworlds.com) |
-| **Contact** | support@auroraworlds.com |
+**Primary Jurisdiction:** Hong Kong Special Administrative Region
 
----
+Aurora Digital Labs Limited is subject to the laws and regulations of Hong Kong, including but not limited to:
 
-## Regulatory Framework
-
-Aurora Protocol's compliance approach is anchored to Hong Kong's existing digital asset regulatory framework:
-
-### Securities and Futures Ordinance (Cap. 617)
-
-| Consideration | Aurora's Position |
-|---------------|-------------------|
-| **Token classification** | RWA participation tokens are structured as fractional claims on batch cash flows — not as equity, debt, or collective investment scheme interests |
-| **Points Program** | Points are non-transferable, carry no monetary value, and do not constitute securities — designed to comply with Cap. 617 boundaries |
-| **`$AUR` governance token** | Not yet issued; will be assessed for regulatory classification prior to issuance |
-| **Platform operation** | Aurora operates as a technology platform facilitating peer-to-protocol financing — not as a licensed exchange, broker, or fund manager |
+- Companies Ordinance (Cap. 622)
+- Securities and Futures Ordinance (Cap. 571)
+- Anti-Money Laundering and Counter-Terrorist Financing Ordinance (Cap. 615)
+- Personal Data (Privacy) Ordinance (Cap. 486)
 
 ---
 
-## KYC/AML Program
+## Token Classification
 
-> **Current status**: KYC/AML is planned but not yet implemented. Full implementation is scheduled prior to live mainnet batch financing.
+### RWA Tokens (ERC-1155 Batch Participation Tokens)
 
-### Planned KYC/AML Framework
+RWA tokens issued through Aurora Protocol represent **fractional participation rights** in a specific batch financing operation. Each token entitles the holder to a proportional share of the returns distributed through the ClaimVault upon batch completion.
 
-| Component | Description |
-|-----------|-------------|
-| **Identity Verification** | Integration with third-party KYC provider for investor and originator identity checks |
-| **Sanctions Screening** | Screening against HKMA sanctions lists and applicable international sanctions regimes |
-| **Ongoing Monitoring** | Continuous transaction monitoring for suspicious activity patterns |
-| **Record Keeping** | Retention of verification records in compliance with applicable data retention requirements |
-| **Reporting** | Suspicious transaction reporting to relevant Hong Kong authorities as required |
+Aurora Protocol's position is that RWA tokens are structured to function as participation instruments within a defined batch lifecycle, rather than as transferable securities or collective investment scheme interests. However, the classification of digital tokens under securities law varies by jurisdiction and is subject to evolving regulatory interpretation.
+
+Participants are responsible for determining whether their acquisition of RWA tokens complies with the laws and regulations of their own jurisdiction.
+
+### Aurora Points
+
+Aurora Points are non-transferable, non-tradeable units with no monetary value. They function solely as a metric for determining proportional allocation in a future $AUR token airdrop. Points are explicitly not securities, tokens, or financial instruments.
+
+### $AUR Governance Token (Planned)
+
+The $AUR token has not yet been issued. When issued, $AUR is intended to function as a governance and utility token within the Aurora Protocol ecosystem. The legal classification and regulatory treatment of $AUR will be assessed and disclosed prior to issuance.
+
+---
+
+## KYC/AML Status
+
+Aurora Protocol does **not currently implement** Know Your Customer (KYC) or Anti-Money Laundering (AML) procedures for DeFi participants. The platform operates on a permissionless basis — any wallet holder can participate in primary sales without identity verification.
+
+**Planned Implementation:**
+
+KYC/AML integration with a third-party identity verification provider is planned for a future protocol update. This will include:
+
+- Identity verification for participants above defined thresholds
+- Sanctions screening against HKMA and international sanctions lists
+- Ongoing transaction monitoring for suspicious activity
+- Record-keeping in compliance with applicable regulations
+
+The timeline for KYC/AML implementation is subject to regulatory guidance and operational readiness.
+
+---
+
+## Originator Compliance
+
+Agricultural originators onboarded to Aurora Protocol are subject to:
+
+- Business registration verification in their jurisdiction of operation
+- Identity verification of key principals
+- Screening against applicable sanctions lists
+- Off-chain financing agreements governing repayment obligations, representations, and warranties
+
+Originator agreements are governed by the laws specified in each agreement and are enforced through off-chain legal mechanisms.
+
+---
+
+## Sanctions Compliance
+
+Aurora Protocol is committed to compliance with applicable sanctions regimes. The platform does not knowingly facilitate transactions involving:
+
+- Individuals or entities designated on the HKMA sanctions list
+- Individuals or entities designated on the United Nations Security Council sanctions list
+- Individuals or entities subject to sanctions by other relevant authorities
+
+Sanctions screening is currently performed during originator onboarding. Participant-level sanctions screening will be implemented as part of the planned KYC/AML integration.
 
 ---
 
 ## Data Protection
 
-Aurora Protocol's data handling practices are governed by a published [Privacy Policy](https://auroraworlds.com) that addresses:
+Aurora Protocol processes personal data in accordance with the Personal Data (Privacy) Ordinance (Cap. 486) of Hong Kong. The Privacy Policy published on the Aurora Protocol website details:
 
-| Area | Coverage |
-|------|----------|
-| **Data collection** | Types of personal and on-chain data collected |
-| **Processing basis** | Legal bases for data processing |
-| **Data retention** | Retention periods aligned with regulatory requirements |
-| **User rights** | Access, correction, deletion, and portability rights |
-| **Third-party sharing** | Disclosure policies for service providers and regulators |
-| **Cross-border transfers** | Safeguards for data transferred outside Hong Kong |
+- Categories of personal data collected
+- Purposes and legal bases for processing
+- Data retention periods
+- Data subject rights and access requests
+- Third-party data sharing
 
----
-
-## Terms of Use
-
-The platform's [Terms of Use](https://auroraworlds.com) establish the legal relationship between users and Aurora Digital Labs Limited, covering:
-
-| Section | Key Provisions |
-|---------|----------------|
-| **Eligibility** | Age requirements, jurisdictional restrictions, prohibited persons |
-| **Platform access** | DApp interaction terms, wallet connection requirements |
-| **Risk acknowledgment** | User acceptance of investment, smart contract, and regulatory risks |
-| **Intellectual property** | Platform IP ownership and permitted use |
-| **Liability** | Limitation of liability provisions |
-| **Dispute resolution** | Governing law and jurisdiction |
+See the full Privacy Policy at [auroraworlds.com](https://auroraworlds.com).
 
 ---
 
-## Compliance Roadmap
+## Points Program Compliance
 
-| Initiative | Status | Priority |
-|------------|--------|----------|
-| KYC/AML provider integration | 📋 Planned | High |
-| Smart contract security audit | 📋 Planned | High |
-| `$AUR` token regulatory assessment | 📋 Planned | Medium |
-| Sanctions screening (HKMA) | 📋 Planned | High |
-| Data breach notification procedures | 📋 Planned | Medium |
-| External legal advisory retainer | 🔄 In Progress | High |
+The Aurora Points Program is designed to comply with Hong Kong's Companies Ordinance (Cap. 617) and has been structured to avoid characteristics of prohibited multi-level marketing or pyramid schemes:
+
+- Referral depth is limited to two layers
+- Referral earnings are capped at 35% of total points
+- Points have no cash value and are non-transferable
+- The program does not require any monetary payment for enrollment
 
 ---
 
-> *Aurora Protocol is committed to operating within the boundaries of applicable law. The regulatory landscape for digital assets is evolving, and the protocol will adapt its compliance framework as new guidance is issued.*
+## No Investment Advice
+
+Nothing published by Aurora Protocol, Aurora Labs, or Aurora Digital Labs Limited constitutes investment, financial, legal, or tax advice. All content is provided for informational purposes only. Participants should consult qualified professional advisors before making any decisions related to their participation in Aurora Protocol.
 
 ---
 
-> **Next**: [Disclaimers →](Disclaimers.md)
+## Regulatory Developments
+
+The regulatory environment for digital assets and decentralized finance is evolving. Aurora Protocol monitors regulatory developments in Hong Kong and relevant jurisdictions and will update its compliance framework as necessary. Material changes to the regulatory environment or to Aurora Protocol's compliance posture will be communicated through official channels.

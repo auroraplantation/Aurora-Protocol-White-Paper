@@ -1,58 +1,134 @@
-# Risks
+# Risk Disclosures
 
-> **Participation in Aurora Protocol involves significant risks. Prospective participants should carefully consider the following risk factors before engaging with the platform.**
-
----
-
-## Risk Matrix
-
-| Category | Risk | Severity | Likelihood | Mitigation |
-|----------|------|:--------:|:----------:|------------|
-| **Smart Contract** | Undiscovered vulnerabilities in protocol contracts | High | Low–Medium | Third-party audit (planned), OpenZeppelin standards, minimal proxy isolation |
-| **Smart Contract** | Dependency on OpenZeppelin library security | Medium | Low | Use of battle-tested, widely-audited library versions |
-| **Originator** | Default on repayment obligations | High | Medium | Originator staking, 5-layer verification, milestone gating |
-| **Originator** | Fraudulent batch submissions | High | Low | Physical inspection, identity verification, staking collateral |
-| **Agricultural** | Crop failure due to weather, disease, or pests | High | Medium | Diversification across crops, regions, and seasons; milestone-based release |
-| **Agricultural** | Market price volatility for harvested crops | Medium | Medium | Conservative yield projections, Originator pricing agreements |
-| **Market** | Insufficient investor demand for batch subscriptions | Medium | Medium | Points Program incentives, community growth, competitive yields |
-| **Market** | Illiquidity of RWA tokens (no secondary market) | Medium | High | Secondary market planned; tokens redeemable at maturity via burn-to-claim |
-| **Regulatory** | Changes in Hong Kong digital asset regulations | Medium | Low–Medium | Ongoing legal monitoring, Cap. 617 compliance framework |
-| **Regulatory** | Classification of RWA tokens as regulated securities | High | Medium | Legal structuring as participation tokens, not equity or debt instruments |
-| **Stablecoin** | USDC issuer (Circle) freeze or blacklist of protocol addresses | High | Low | Monitoring issuer policies, contingency planning |
-| **Stablecoin** | USDC de-peg from USD | Medium | Low | Established USDC track record; no mitigation against systemic de-peg events |
-| **Operational** | Manual verification errors or delays | Medium | Medium | Standardized verification checklists, planned automation |
-| **Operational** | Key-person dependency on small core team | Medium | Medium | Documentation, knowledge sharing, planned team expansion |
-| **Network** | Ethereum gas cost spikes | Low | Medium | EIP-1167 proxy pattern minimizes deployment costs; L2 migration planned |
-| **Network** | Ethereum network congestion or downtime | Low | Low | Non-time-critical settlement design; milestone deadlines accommodate delays |
+Participation in Aurora Protocol involves significant risks. This section provides a comprehensive overview of the risks that participants should understand before purchasing RWA tokens or engaging with the protocol. This is not an exhaustive list, and additional risks may emerge as the protocol evolves.
 
 ---
 
-## Risk Categories Explained
+## Smart Contract Risk
 
-### Smart Contract Risk
+Aurora Protocol's smart contracts have **not yet been audited** by a third-party security firm. Unaudited smart contracts may contain bugs, vulnerabilities, or logic errors that could result in loss of funds. Even after audit, no smart contract can be guaranteed to be free of vulnerabilities.
 
-Aurora Protocol's contracts have not yet undergone a formal third-party security audit. While the architecture follows industry best practices — including OpenZeppelin standards, role-based access control, and minimal proxy isolation — undiscovered vulnerabilities may exist. A comprehensive audit is planned prior to mainnet launch of live financing batches.
+**Specific risks include:**
+- Undiscovered bugs in escrow, sale, or claim logic
+- Reentrancy or access control vulnerabilities
+- Unforeseen interactions between linked contracts
+- Dependency on OpenZeppelin library correctness
 
-### Originator and Agricultural Risk
-
-The protocol finances real-world agricultural activities subject to natural, operational, and market risks. Crop failures, supply chain disruptions, and originator default are inherent to this asset class. The milestone-gated disbursement model and originator staking mechanism are designed to reduce, but cannot eliminate, these risks.
-
-### Regulatory Risk
-
-The regulatory landscape for digital assets and tokenized real-world assets is evolving globally. Changes in Hong Kong regulations or in jurisdictions where investors or originators are located could impact the protocol's operations, fee structures, or the legal status of RWA tokens.
-
-### Stablecoin Risk
-
-All protocol settlements are denominated in `USDC`. As a centralized stablecoin, USDC is subject to issuer risk — including the possibility that Circle may freeze or blacklist specific addresses. A de-peg event, though historically brief, could affect the value of funds in transit.
-
-### Liquidity Risk
-
-RWA tokens currently have no secondary market. Investors should consider their investment illiquid until the batch reaches maturity and burn-to-claim redemption becomes available. A secondary trading venue is planned but not yet operational.
+**Mitigation:** A comprehensive third-party audit is planned prior to production batch deployment. Contracts are built on widely-used, battle-tested OpenZeppelin standards.
 
 ---
 
-> *This list is not exhaustive. Additional risks may emerge as the protocol, market, and regulatory environment evolve. Participants should conduct their own due diligence and consult professional advisors before making any investment decisions.*
+## Originator Default Risk
+
+The originator may fail to repay the agreed return amount. Default may result from:
+
+- Crop failure (disease, pests, drought, flooding)
+- Market price decline below the originator's cost basis
+- Operational mismanagement
+- Fraud or misrepresentation
+- Force majeure events (natural disasters, political instability)
+
+**Consequence:** Partial or total loss of participant capital. Funds already disbursed in prior milestones are not recoverable through the smart contract.
+
+**Mitigation:** 5-layer verification architecture, milestone-based disbursement, originator $AUR staking (when activated), and off-chain legal agreements.
 
 ---
 
-> **Next**: [Legal and Compliance →](Legal-and-Compliance.md)
+## Agricultural and Climate Risk
+
+Agricultural operations are inherently exposed to environmental and biological risks:
+
+- Weather events (typhoons, drought, excessive rainfall)
+- Pest and disease outbreaks
+- Soil degradation
+- Climate change impacts on growing seasons and yields
+
+These risks can cause partial or total crop failure, which directly impacts the originator's ability to repay.
+
+---
+
+## Market and Commodity Price Risk
+
+Agricultural returns depend on the sale price of harvested commodities. If market prices decline significantly between the time of financing and the time of sale, the originator may generate insufficient revenue to cover repayment obligations.
+
+---
+
+## Stablecoin Risk
+
+All Aurora Protocol transactions are denominated in **USDC**. USDC is issued by Circle and is subject to:
+
+- **Issuer risk** — Circle could face regulatory action, insolvency, or operational failure
+- **Redemption risk** — USDC may trade below par during stress events
+- **Freeze risk** — Circle has the ability to freeze USDC held in specific addresses pursuant to law enforcement requests or regulatory orders
+- **Smart contract risk** — The USDC contract itself could have vulnerabilities
+
+Aurora Protocol does not control or guarantee the stability or availability of USDC.
+
+---
+
+## Liquidity Risk
+
+RWA tokens are currently **non-transferable**. There is no secondary market for trading RWA tokens. Participants cannot exit their position before the batch lifecycle concludes. Secondary market functionality is planned but not guaranteed.
+
+Even after secondary markets are enabled, RWA tokens may have limited liquidity due to small batch sizes, limited market participants, or lack of market maker support.
+
+---
+
+## Regulatory and Legal Risk
+
+- Regulatory frameworks for digital assets, tokenized securities, and DeFi protocols are evolving rapidly and vary by jurisdiction
+- Aurora Protocol may be subject to regulatory actions in Hong Kong or other jurisdictions
+- Changes in law or regulation could restrict protocol operations, require participant identification, or prohibit participation from certain jurisdictions
+- The classification of RWA tokens as securities, utility tokens, or other instruments is not definitively settled in all jurisdictions
+
+---
+
+## Operational Risk
+
+Aurora Protocol is currently operated by **Aurora Labs**, a small team. Operational risks include:
+
+- Key person dependency
+- Operational errors in verification or milestone confirmation
+- Data entry errors (current data entry is manual)
+- Communication failures with originators
+- Infrastructure downtime or frontend unavailability
+
+---
+
+## Ethereum Network Risk
+
+Aurora Protocol is deployed exclusively on Ethereum mainnet. Risks include:
+
+- Network congestion causing high gas fees or delayed transactions
+- Ethereum protocol changes that affect contract behavior
+- MEV (maximal extractable value) attacks on transactions
+- Potential chain reorganizations or consensus failures
+
+---
+
+## Concentration Risk
+
+During early operations, Aurora Protocol may rely on a small number of originators and geographic regions. Poor performance by a single originator or adverse conditions in a single market could disproportionately impact platform performance and reputation.
+
+---
+
+## $AUR Token Risk
+
+The $AUR governance token has not yet been issued. Risks related to the future $AUR token include:
+
+- The token may never be issued
+- Token characteristics, supply, and distribution may change from current descriptions
+- $AUR may have no liquid market or may trade significantly below expectations
+- Regulatory developments may restrict $AUR issuance or distribution
+
+---
+
+## No Insurance or Guarantee
+
+Aurora Protocol does not provide deposit insurance, principal guarantees, or any form of return guarantee. Participation in any batch may result in partial or total loss of invested capital.
+
+---
+
+## General Disclaimer
+
+This risk disclosure section is provided for informational purposes and does not constitute legal, financial, or investment advice. Participants should conduct their own due diligence and consult qualified advisors before participating in Aurora Protocol. See [Disclaimers](Disclaimers.md) for full legal disclaimers.

@@ -1,89 +1,66 @@
 # Roadmap
 
-> **Aurora Protocol's development roadmap spans four phases — from core infrastructure buildout through ecosystem maturity and global expansion.**
+Aurora Protocol's development follows a phased approach: prove the model first, then scale systematically. Each phase builds on verified outcomes from the previous one.
 
 ---
 
-## Progress Overview
+## Phase 1 — Foundation (Current)
 
-| Phase | Name | Status |
-|-------|------|--------|
-| Phase 1 | Foundation | ✅ Completed |
-| Phase 2 | Launch | 🔄 In Progress |
-| Phase 3 | Growth | 📋 Planned |
-| Phase 4 | Expansion | 📋 Planned |
+**Status: In Progress**
 
----
+- Smart contract architecture designed and implemented (5 contracts) — Complete
+- Frontend demo application live — Complete
+- Initial Southeast Asian farmer contacts established — Complete
+- Aurora Points Program designed — Complete
+- White paper, Terms of Use, and Privacy Policy published — Complete
+- Self-funded over $200,000 — Complete
+- 5,000+ community members — Complete
+- Seed round ($1,000,000 target) — Pending
+- Third-party smart contract audit — Pending
+- First batch deployment on Ethereum mainnet — Pending
 
-## Phase 1 — Foundation ✅
+## Phase 2 — Validation
 
-*Core infrastructure and initial validation.*
+**Status: Planned**
 
-| Milestone | Status |
-|-----------|--------|
-| Five-contract smart contract architecture (BatchFactory, AuroraRWA1155, PrimarySale, EscrowVault, ClaimVault) | ✅ Complete |
-| Minimal proxy clone deployment pattern (EIP-1167) | ✅ Complete |
-| Role-based access control with admin handover | ✅ Complete |
-| Frontend demo application live | ✅ Complete |
-| Aurora Digital Labs Limited incorporated (Hong Kong) | ✅ Complete |
-| Self-funded over $200K | ✅ Complete |
-| Initial Southeast Asian farmer contacts established | ✅ Complete |
-| 5,000+ community members | ✅ Complete |
-| White Paper v1.1 published | ✅ Complete |
-| Terms of Use and Privacy Policy published | ✅ Complete |
-| Points Program designed and documented | ✅ Complete |
+- First live batch cycle (end-to-end: funding → milestones → returns → claims)
+- On-chain track record established with verifiable performance data
+- KYC/AML integration with third-party identity verification provider
+- Aurora Points Program live and accumulating participant activity
+- Originator pipeline expansion in Thailand
+- Verification process documentation and standardization
 
----
+## Phase 3 — Growth
 
-## Phase 2 — Launch 🔄
+**Status: Planned**
 
-*First live batches and operational validation.*
+- $AUR governance token generation event
+- Originator staking mechanism activated
+- Points-to-$AUR airdrop conversion
+- Geographic expansion to Vietnam and Indonesia
+- Secondary market for RWA tokens (enabling token transfers and trading)
+- Batch volume scaling — multiple concurrent batches across originators
+- Institutional participant onboarding
 
-| Milestone | Status |
-|-----------|--------|
-| Seed round fundraising ($1,000,000 target) | 🔄 In Progress |
-| KYC/AML integration with third-party provider | 📋 Planned |
-| Smart contract audit by reputable security firm | 📋 Planned |
-| First live agricultural financing batch on mainnet | 📋 Planned |
-| Farmer off-chain agreement framework finalized | 🔄 In Progress |
-| Points Program live deployment | 📋 Planned |
-| Oracle integration for agricultural data feeds | 📋 Planned |
+## Phase 4 — Maturity
 
----
+**Status: Long-term Vision**
 
-## Phase 3 — Growth 📋
-
-*Scaling batch volume and expanding the originator network.*
-
-| Milestone | Status |
-|-----------|--------|
-| Secondary market for RWA token trading | 📋 Planned |
-| `$AUR` governance token issuance | 📋 Planned |
-| Originator staking mechanism live | 📋 Planned |
-| Expanded verification partnerships across Southeast Asia | 📋 Planned |
-| Multi-crop and multi-region batch support | 📋 Planned |
-| Institutional investor onboarding | 📋 Planned |
-| Enhanced analytics and reporting dashboard | 📋 Planned |
+- Decentralized verification network (reducing reliance on Aurora Labs for milestone confirmation)
+- Oracle integration for automated data feeds (weather, commodity prices, satellite imagery)
+- Multi-chain deployment consideration
+- Governance framework for protocol-level decisions
+- Expansion beyond Southeast Asia to other emerging agricultural markets
+- Advanced batch structures (multi-tranche, variable-rate, insurance-linked)
 
 ---
 
-## Phase 4 — Expansion 📋
+## Development Principles
 
-*Global reach and ecosystem maturity.*
+**Evidence over ambition:** Each phase is gated by demonstrated success in the previous phase, not by timeline pressure.
 
-| Milestone | Status |
-|-----------|--------|
-| Expansion beyond Southeast Asia (Africa, Latin America) | 📋 Planned |
-| Layer 2 deployment for reduced gas costs | 📋 Planned |
-| Cross-chain interoperability | 📋 Planned |
-| DAO governance structure | 📋 Planned |
-| Data services and premium analytics revenue stream | 📋 Planned |
-| Strategic partnerships with multilateral agricultural organizations | 📋 Planned |
+**Transparency:** Progress is communicated openly. Delays, setbacks, and pivots are disclosed, not hidden.
 
----
+**Security first:** No production batch will be deployed without a completed smart contract audit.
 
-> *Timelines are indicative and subject to change based on market conditions, regulatory developments, and fundraising outcomes.*
-
----
-
-> **Next**: [Team →](Team.md)
+**Incremental decentralization:** Aurora Labs operates the protocol centrally today to ensure quality and safety. Decentralization is a goal, not a starting point.
